@@ -363,13 +363,15 @@ export class NguCarousel<T> extends NguCarouselStore
           });
         }
         hammertime.on('panend pancancel', (ev: any) => {
-          if (Math.abs(ev.velocity) >= this.velocity) {
-            this.touch.velocity = ev.velocity;
+          const delta = this.vertical.enabled ? ev.deltaY : ev.deltaX;
+          const velocity = Math.abs(ev.velocity) > Math.abs(ev.overallVelocity) ? ev.velocity : ev.overallVelocity;
+          if (Math.abs(delta + velocity / .7 * this.itemWidth / 2) > this.itemWidth / 2) {
+            this.touch.velocity = velocity;
             let direc = 0;
             if (!this.RTL) {
-              direc = this.touch.swipe === 'panright' ? 0 : 1;
+              direc = delta > 0 ? 0 : 1;
             } else {
-              direc = this.touch.swipe === 'panright' ? 1 : 0;
+              direc = delta > 0 ? 1 : 0;
             }
             this._carouselScrollOne(direc);
           } else {
